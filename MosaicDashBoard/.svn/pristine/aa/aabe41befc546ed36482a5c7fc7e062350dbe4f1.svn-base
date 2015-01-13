@@ -1,0 +1,744 @@
+var processJSON;
+var agediagnosis_chart_data_json;
+var gender_chart_data_json;
+var bmi_chart_data_json;
+var comorb_chart_data_json;
+var cvr_chart_data_json;
+
+$(function(){
+	renderContainer();
+
+});
+
+$( window ).resize(function() {
+	renderContainer();    		
+});
+
+function renderContainer(){
+	$('#chart_container').width(Math.floor($('#dashboard_container').innerWidth() - $('#menu_container').innerWidth()-50));
+
+	$('#chart_container').height($('#dashboard_container').height());
+	$('#menu_container').height($('#dashboard_container').height());
+
+	//setloader position
+	$('.loader').css('left',($('#dashboard_container').innerWidth()/2)-$('.loader').innerWidth());
+
+	$("#singlePatientDataContainer").hide();
+
+	hideFilters();
+	hideLoader();
+	hideGraphs(2);
+	hideGraphs(3);
+	showTooltip(1);
+
+	//setting search patient action
+	bindSearchPatient();
+}
+
+
+google.load("visualization", "1", {packages:["corechart", "timeline"]});
+google.setOnLoadCallback(drawCharts);
+
+function drawCharts() {
+//	GENDER
+	gender_chart_data_json = $.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "1",chart_type: "gender"}
+	}).responseText;
+
+	var gender_chart_data = new google.visualization.DataTable(gender_chart_data_json);
+
+	var gender_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			legend: {position: 'right', alignment: 'center'},
+			pieSliceText: 'value'
+	};
+
+	var gender_chart = new google.visualization.PieChart(document.getElementById('gender_chart'));
+	gender_chart.draw(gender_chart_data, gender_options);
+
+//	BMI        
+
+	bmi_chart_data_json = $.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "1",chart_type: "bmi"}
+	}).responseText;
+
+	var bmi_chart_data = new google.visualization.DataTable(bmi_chart_data_json);
+
+
+	var bmi_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			//	vAxis: {title: 'Accumulated Rating'},
+			//isStacked: true,
+			legend: {position: 'top', alignment: 'center'},
+			curveType: 'function'
+	};
+
+	var bmi_chart = new google.visualization.ColumnChart(document.getElementById('bmi_chart'));
+//	var bmi_chart = new google.visualization.LineChart(document.getElementById('bmi_chart'));
+	bmi_chart.draw(bmi_chart_data, bmi_options);
+
+
+//	COMORBIDITY
+	comorb_chart_data_json = $.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "1",chart_type: "comorbidity"}
+	}).responseText;
+
+	var comorb_chart_data = new google.visualization.DataTable(comorb_chart_data_json);
+
+	var comorb_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			legend: {position: 'right', alignment: 'center'},
+			pieSliceText: 'value'
+	};
+
+	var comorb_chart = new google.visualization.PieChart(document.getElementById('comorb_chart'));
+	comorb_chart.draw(comorb_chart_data, comorb_options);
+
+//	AGE@DIAGNOSIS
+
+	agediagnosis_chart_data_json = $.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "1", chart_type: "age_diagnosis"}
+	}).responseText;
+
+	agediagnosis_chart_data_json = jQuery.parseJSON(agediagnosis_chart_data_json);
+
+	var agediagnosis_chart_data = new google.visualization.DataTable(agediagnosis_chart_data_json.chart_json);
+
+	var agediagnosis_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			legend: {position: 'right', alignment: 'center'},
+			pieSliceText: 'value'
+	};
+
+	var agediagnosis_chart = new google.visualization.PieChart(document.getElementById('agediagnosis_chart'));
+	agediagnosis_chart.draw(agediagnosis_chart_data, agediagnosis_options);
+
+
+	//CARDIOVASCULAR RISK
+	cvr_chart_data_json = $.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "1",chart_type: "cvr"}
+	}).responseText;
+
+	var cvr_chart_data = new google.visualization.DataTable(cvr_chart_data_json);
+
+	var cvr_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			legend: {position: 'right', alignment: 'center'},
+			pieSliceText: 'value'
+	};
+
+	var cvr_chart = new google.visualization.PieChart(document.getElementById('cvr_chart'));
+	cvr_chart.draw(cvr_chart_data, cvr_options);
+
+//	ADD SELECTORS FOR STEP2
+
+	//GENDER SELECTOR
+	google.visualization.events.addListener(gender_chart, 'select', selectGenderHandler);
+
+	function selectGenderHandler(e) {
+		//alert('A table row was selected');
+		var selected = gender_chart.getSelection();
+
+		var selectedStr = "";
+		if(parseInt(selected[0].row)==0){
+			selectedStr = "M";
+		}
+		else{
+			selectedStr = "F";
+		}
+
+		hideGraphs(1);
+		showLoader();
+
+		$.ajax({
+			url: "./i2b2Servlet/",
+			dataType:"json",
+			async: true,
+			data: { step: "2",
+				chart_type: "gender_process",
+				selected_value:  selected[0].row  
+			},
+			complete: function(results){
+				$('#step_item_1 > span').text("Gender: " + selectedStr);
+				$('#step_item_1').show();
+				showTooltip(2);
+				gender_chart.setSelection(null);
+				getProcess("gender_process", results.responseText);
+			}
+		});
+	}
+
+	//AGE@DIAGNOSIS SELECTOR
+	google.visualization.events.addListener(agediagnosis_chart, 'select', selectAgeHandler);
+
+	function selectAgeHandler(e) {
+		//alert('A table row was selected');
+		var selected = agediagnosis_chart.getSelection();
+
+		var selectedStr = "";
+		if(parseInt(selected[0].row)==0){
+			selectedStr = "0-10";
+		}
+		else if(parseInt(selected[0].row)<=9){
+			selectedStr = selected[0].row +"0-"+(parseInt(selected[0].row)+1)+"0"; 
+		}
+		else{
+			selectedStr = "sup-100";
+		}
+
+		hideGraphs(1);
+		showLoader();
+
+		$.ajax({
+			url: "./i2b2Servlet/",
+			dataType:"json",
+			async: true,
+			data: { step: "2",
+				chart_type: "age_process",
+				selected_value:  agediagnosis_chart_data_json.raw_values[selected[0].row].patient_nums  
+			},
+			complete: function(results){
+				$('#step_item_1 > span').text("Age: " + selectedStr);
+				$('#step_item_1').show();
+				showTooltip(2);
+				agediagnosis_chart.setSelection(null);
+				getProcess("age_process", results.responseText);
+			}
+		});
+	}
+
+	//CVR SELECTOR
+	google.visualization.events.addListener(cvr_chart, 'select', selectVRHandler);
+
+	function selectVRHandler(e) {
+		//alert('A table row was selected');
+		var selected = cvr_chart.getSelection();
+
+		var selectedStr = "";
+		if(parseInt(selected[0].row)==0){
+			selectedStr = "High";
+		}
+		else if(parseInt(selected[0].row)==1){
+			selectedStr = "Low";
+		}
+		else{
+			selectedStr = "Moderate";
+		}
+
+		hideGraphs(1);
+		showLoader();
+
+		$.ajax({
+			url: "./i2b2Servlet/",
+			dataType:"json",
+			async: true,
+			data: { step: "2",
+				chart_type: "cvr_process",
+				selected_value:  selected[0].row  
+			},
+			complete: function(results){
+				$('#step_item_1 > span').text("CVR: " + selectedStr);
+				$('#step_item_1').show();
+				showTooltip(2);
+				cvr_chart.setSelection(null);
+				getProcess("cvr_process", results.responseText);
+			}
+		});
+	}
+}
+
+function getProcess(chart_type, data){
+	hideLoader();
+	setMenu(2);
+	showGraphs(2);
+	drawProcessChart(data);	
+}
+
+function hideGraphs(step){
+	manageGraphs(step, false);
+}
+
+function showGraphs(step){
+	manageGraphs(step, true);
+}
+
+function manageGraphs(step, show){
+	var classStr = ".";
+	if (step == 1) {
+		classStr += "step_one";
+	} 
+	else if (step == 2) {
+		classStr += "step_two";
+	}
+	else if (step == 3) {
+		classStr += "step_three";
+	}
+
+	$(classStr).each(function() {
+		if(show){
+			$(this).show();
+		}
+		else{
+			$(this).hide();
+		}
+	});
+}
+
+function setMenu(level_int){
+	$(".menu_item_selected").removeClass("menu_item_selected");
+	$("#menu_item_"+level_int).addClass("menu_item_selected");
+}
+
+function showLoader() {
+	$('#loader').show();
+}
+
+function showTooltip(step){
+	$('#menu_tooltip > div').each(function(){
+		$(this).hide();
+	});
+	$('#step_'+step+'_tooltip').show();
+
+}
+
+function hideLoader() {
+	$('#loader').hide();
+}
+
+function hidePatientsData(){
+	$('#singlePatientDataContainer').hide();
+}
+
+function hideFilters(step){
+	if(!step){
+		$('.step_item').hide();
+	}
+	else{
+		$('#step_item_'+step).hide();
+	}
+}
+
+function reloadPage(){
+	window.location.reload();
+}
+
+function homeClick(){
+	showTooltip(1);
+	hideFilters();
+	hideGraphs(2);
+	hideGraphs(3);
+	hidePatientsData();
+	showGraphs(1);
+	setMenu(1);
+}
+
+
+var processChart;
+
+function drawProcessChart(data){
+	var FROM_MS_TO_DAY = 86400000;
+
+	//il file in ingresso è ancora da modificare con gli attributi label e steps corretti
+	var obj = jQuery.parseJSON(data);
+	//var obj = jQuery.parseJSON('{"histories":[{"label":"story_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"out","id":"event","n_pts":"6","time":2,"idcod":"4043;5353;11567;11813;14364;17409;"}]},{"label":"story_1_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_1_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-57"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":1,"idcod":"16807;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_1_1_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-57"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":1,"idcod":"16807;"},{"label":"wait","id":"transition","n_pts":0,"time":"1593"},{"label":"In_Hospital","id":"event","n_pts":1,"time":10,"idcod":"16807;"},{"label":"out","id":"event","n_pts":"1","time":2625,"idcod":"16807;"}]},{"label":"story_1_1_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"34"},{"label":"In_Hospital","id":"event","n_pts":3,"time":3,"idcod":"11769;16172;18777;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_1_2_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"34"},{"label":"In_Hospital","id":"event","n_pts":3,"time":3,"idcod":"11769;16172;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"20"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":37,"idcod":"16172;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_1_2_1_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"34"},{"label":"In_Hospital","id":"event","n_pts":3,"time":3,"idcod":"11769;16172;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"20"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":37,"idcod":"16172;"},{"label":"wait","id":"transition","n_pts":0,"time":"1280"},{"label":"In_Hospital","id":"event","n_pts":1,"time":11,"idcod":"16172;"},{"label":"out","id":"event","n_pts":"1","time":1451,"idcod":"16172;"}]},{"label":"story_1_1_2_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"34"},{"label":"In_Hospital","id":"event","n_pts":3,"time":3,"idcod":"11769;16172;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-34"},{"label":"In_Hospital","id":"event","n_pts":2,"time":5,"idcod":"11769;18777;"},{"label":"out","id":"event","n_pts":"1","time":735,"idcod":"18777;"}]},{"label":"story_1_1_2_2_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"34"},{"label":"In_Hospital","id":"event","n_pts":3,"time":3,"idcod":"11769;16172;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-34"},{"label":"In_Hospital","id":"event","n_pts":2,"time":5,"idcod":"11769;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-124"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":24,"idcod":"11769;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_1_2_2_1_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"193"},{"label":"Day_Hospital","id":"event","n_pts":4,"time":5,"idcod":"11769;16172;16807;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"34"},{"label":"In_Hospital","id":"event","n_pts":3,"time":3,"idcod":"11769;16172;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-34"},{"label":"In_Hospital","id":"event","n_pts":2,"time":5,"idcod":"11769;18777;"},{"label":"wait","id":"transition","n_pts":0,"time":"-124"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":24,"idcod":"11769;"},{"label":"wait","id":"transition","n_pts":0,"time":"53"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":4,"idcod":"11769;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"out","id":"event","n_pts":"2","time":1506,"idcod":"5121;21586;"}]},{"label":"story_1_2_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"343"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":2,"idcod":"21006;"},{"label":"out","id":"event","n_pts":"1","time":730,"idcod":"21006;"}]},{"label":"story_1_2_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"827"},{"label":"In_Hospital","id":"event","n_pts":4,"time":6,"idcod":"8281;14256;19261;20855;"},{"label":"out","id":"event","n_pts":"1","time":1514,"idcod":"14256;"}]},{"label":"story_1_2_2_1","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"827"},{"label":"In_Hospital","id":"event","n_pts":4,"time":6,"idcod":"8281;14256;19261;20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"365"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":1,"idcod":"20855;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_2_2_1_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"827"},{"label":"In_Hospital","id":"event","n_pts":4,"time":6,"idcod":"8281;14256;19261;20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"365"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":1,"idcod":"20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"2183"},{"label":"In_Hospital","id":"event","n_pts":1,"time":5,"idcod":"20855;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_1_2_2_1_2_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"827"},{"label":"In_Hospital","id":"event","n_pts":4,"time":6,"idcod":"8281;14256;19261;20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"365"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":1,"idcod":"20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"2183"},{"label":"In_Hospital","id":"event","n_pts":1,"time":5,"idcod":"20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"46"},{"label":"In_Hospital","id":"event","n_pts":1,"time":14,"idcod":"20855;"},{"label":"out","id":"event","n_pts":"1","time":2805,"idcod":"20855;"}]},{"label":"story_1_2_2_2","steps":[{"label":"Day_Hospital","id":"event","n_pts":17,"time":1,"idcod":"4043;5121;5353;8281;11567;11769;11813;14256;14364;16172;16807;17409;18777;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"376"},{"label":"In_Hospital","id":"event","n_pts":7,"time":7,"idcod":"5121;8281;14256;19261;20855;21006;21586;"},{"label":"wait","id":"transition","n_pts":0,"time":"827"},{"label":"In_Hospital","id":"event","n_pts":4,"time":6,"idcod":"8281;14256;19261;20855;"},{"label":"wait","id":"transition","n_pts":0,"time":"480"},{"label":"In_Hospital","id":"event","n_pts":2,"time":13,"idcod":"8281;19261;"},{"label":"out","id":"event","n_pts":"2","time":2194,"idcod":"8281;19261;"}]},{"label":"story_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"out","id":"event","n_pts":"10","time":3,"idcod":"123;11509;14483;16809;18724;18817;20994;21375;21539;21575;"}]},{"label":"story_2_1","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"283"},{"label":"Day_Hospital","id":"event","n_pts":2,"time":17,"idcod":"7863;8387;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_1_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"283"},{"label":"Day_Hospital","id":"event","n_pts":2,"time":17,"idcod":"7863;8387;"},{"label":"wait","id":"transition","n_pts":0,"time":"-77"},{"label":"In_Hospital","id":"event","n_pts":2,"time":7,"idcod":"7863;8387;"},{"label":"out","id":"event","n_pts":"2","time":240,"idcod":"7863;8387;"}]},{"label":"story_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"out","id":"event","n_pts":"3","time":60,"idcod":"4388;18411;21585;"}]},{"label":"story_2_2_1","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"120"},{"label":"Day_Hospital","id":"event","n_pts":2,"time":5,"idcod":"12653;16000;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_1_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"120"},{"label":"Day_Hospital","id":"event","n_pts":2,"time":5,"idcod":"12653;16000;"},{"label":"wait","id":"transition","n_pts":0,"time":"396"},{"label":"In_Hospital","id":"event","n_pts":2,"time":6,"idcod":"12653;16000;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_1_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"120"},{"label":"Day_Hospital","id":"event","n_pts":2,"time":5,"idcod":"12653;16000;"},{"label":"wait","id":"transition","n_pts":0,"time":"396"},{"label":"In_Hospital","id":"event","n_pts":2,"time":6,"idcod":"12653;16000;"},{"label":"wait","id":"transition","n_pts":0,"time":"1840"},{"label":"In_Hospital","id":"event","n_pts":2,"time":3,"idcod":"12653;16000;"},{"label":"out","id":"event","n_pts":"2","time":2330,"idcod":"12653;16000;"}]},{"label":"story_2_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_2_1","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"402"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":26,"idcod":"182;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_2_1_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"402"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":26,"idcod":"182;"},{"label":"wait","id":"transition","n_pts":0,"time":"-257"},{"label":"In_Hospital","id":"event","n_pts":1,"time":8,"idcod":"182;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_2_1_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"402"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":26,"idcod":"182;"},{"label":"wait","id":"transition","n_pts":0,"time":"-257"},{"label":"In_Hospital","id":"event","n_pts":1,"time":8,"idcod":"182;"},{"label":"wait","id":"transition","n_pts":0,"time":"288"},{"label":"In_Hospital","id":"event","n_pts":1,"time":14,"idcod":"182;"},{"label":"out","id":"event","n_pts":"1","time":1030,"idcod":"182;"}]},{"label":"story_2_2_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"90"},{"label":"In_Hospital","id":"event","n_pts":10,"time":10,"idcod":"212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"out","id":"event","n_pts":"4","time":2156,"idcod":"8548;14968;18254;21576;"}]},{"label":"story_2_2_2_2_1","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"90"},{"label":"In_Hospital","id":"event","n_pts":10,"time":10,"idcod":"212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"291"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":23,"idcod":"212;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_2_2_1_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"90"},{"label":"In_Hospital","id":"event","n_pts":10,"time":10,"idcod":"212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"291"},{"label":"Day_Hospital","id":"event","n_pts":1,"time":23,"idcod":"212;"},{"label":"wait","id":"transition","n_pts":0,"time":"1920"},{"label":"In_Hospital","id":"event","n_pts":1,"time":26,"idcod":"212;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]},{"label":"story_2_2_2_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"90"},{"label":"In_Hospital","id":"event","n_pts":10,"time":10,"idcod":"212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"89"},{"label":"In_Hospital","id":"event","n_pts":5,"time":4,"idcod":"427;1010;5620;8024;11871;"},{"label":"out","id":"event","n_pts":"1","time":48,"idcod":"11871;"}]},{"label":"story_2_2_2_2_2_2","steps":[{"label":"In_Hospital","id":"event","n_pts":28,"time":8,"idcod":"123;182;212;427;1010;4388;5620;7863;8024;8387;8548;11509;11871;12653;14483;14968;16000;16809;18254;18411;18724;18817;20994;21375;21539;21575;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"316"},{"label":"In_Hospital","id":"event","n_pts":16,"time":13,"idcod":"182;212;427;1010;4388;5620;8024;8548;11871;12653;14968;16000;18254;18411;21576;21585;"},{"label":"wait","id":"transition","n_pts":0,"time":"104"},{"label":"In_Hospital","id":"event","n_pts":11,"time":7,"idcod":"182;212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"90"},{"label":"In_Hospital","id":"event","n_pts":10,"time":10,"idcod":"212;427;1010;5620;8024;8548;11871;14968;18254;21576;"},{"label":"wait","id":"transition","n_pts":0,"time":"89"},{"label":"In_Hospital","id":"event","n_pts":5,"time":4,"idcod":"427;1010;5620;8024;11871;"},{"label":"wait","id":"transition","n_pts":0,"time":"321"},{"label":"In_Hospital","id":"event","n_pts":4,"time":14,"idcod":"427;1010;5620;8024;"},{"label":"out","id":"event","n_pts":"0","time":0,"idcod":"0"}]}]}');
+	//var obj = jQuery.parseJSON('{"histories":[{"label":"story_1","steps":[{"label":"DayHospital","id":"event","n_pts":44,"time":1,"idcod":"1382;3679;4567;5121;5353;5367;5983;6197;6416;6840;7024;7995;8333;9155;10050;10350;11065;11567;11811;11813;11814;13755;14364;15016;16504;16807;17181;17409;17921;18336;18621;19006;19287;19496;19570;19758;19966;20011;20119;21003;21006;21261;21586;21596;"},{"label":"out","id":"event","n_pts":"13","time":1,"idcod":"5353;5983;8333;11813;14364;15016;16504;17409;18336;19287;19496;20119;21003;"}]},{"label":"story_2","steps":[{"label":"InHospital","id":"event","n_pts":104,"time":6,"idcod":"123;182;212;231;427;512;752;1010;1347;2004;2255;3381;3474;4043;4067;4156;4388;4438;4516;4633;5620;5719;5774;5796;5836;5862;6039;6342;6662;6828;6906;7243;7367;7752;7863;7990;8024;8281;8370;8387;8457;8548;9136;9185;9266;9306;9737;10667;10808;10812;11018;11284;11421;11422;11509;11769;11871;11934;12609;12653;12743;13126;13529;14107;14177;14256;14483;14700;14968;15009;15034;15370;15418;15981;16000;16172;16690;16809;17262;17458;17738;17773;18254;18411;18724;18777;18817;19261;19732;19960;20046;20855;20994;21071;21179;21213;21288;21507;21539;21575;21576;21585;21591;21597;"},{"label":"out","id":"event","n_pts":"19","time":4,"idcod":"1347;4067;4156;4633;8370;9306;9737;10812;11509;12743;14483;16809;18724;18817;20994;21213;21539;21575;21597;"}]}]}');
+	processJSON = obj;
+
+	var container = document.getElementById('path_chart');
+	var processChart = new google.visualization.Timeline(container);
+
+	var dataTable = new google.visualization.DataTable();
+	dataTable.addColumn({ type: 'string', id: 'Story' });
+	dataTable.addColumn({ type: 'string', id: 'Step' });
+	dataTable.addColumn({ type: 'number', id: 'Start' });
+	dataTable.addColumn({ type: 'number', id: 'End' });
+
+	var dtRows = 0;
+	for(k=0;k<obj.histories.length;k++){
+		dtRows += obj.histories[k].steps.length;
+	}
+
+	dataTable.addRows(dtRows);
+
+	var row = 0;
+
+	for(i=0; i<obj.histories.length;i++){
+		var start = 0;
+		var path = obj.histories[i];
+		for(j=0;j<path.steps.length;j++){
+			dataTable.setCell(row, 0, path.label);
+			dataTable.setCell(row, 1, path.steps[j].label);
+			dataTable.setCell(row, 2, start*FROM_MS_TO_DAY);
+			dataTable.setCell(row, 3, (start+parseInt(path.steps[j].time))*FROM_MS_TO_DAY);
+
+			path.steps[j].fb=row;
+
+			start+=parseInt(path.steps[j].time);
+			row++;
+		}
+	}
+
+
+
+	var options = {
+			avoidOverlappingGridLines: false
+	};
+
+	processChart.draw(dataTable, options);
+	//hide x-labels
+	$($('svg', $('#path_chart')).children()[2]).hide();
+
+
+	google.visualization.events.addListener(processChart, 'select', selectHandler);
+
+	function selectHandler() {
+		var selected = processChart.getSelection();
+		//alert('A table row was selected');
+
+		hideGraphs(2);
+		showLoader();
+
+		var p_num_param = "";
+		var history ="";
+		var step ="";
+
+		for(i=0; i<processJSON.histories.length;i++){
+			var steps = processJSON.histories[i].steps;
+			for(j=0;j<steps.length;j++){
+				if(steps[j].fb == selected[0].Fb){        //TO-DO: da controllare perchè non funziona
+					p_num_param = steps[j].idcod;
+					history = processJSON.histories[i].label;
+					step = steps[j].label;
+					break;
+				}
+			}
+		}
+
+		$.ajax({
+			url: "./i2b2Servlet/",
+			dataType:"json",
+			async: true,
+			data: { step: "3",
+				chart_type: "comorb",
+				patient_nums: p_num_param
+			},
+			complete: function(results){
+				$('#step_item_2 > span').text("History: " + history);
+				$('#step_item_3 > span').text("Step: " + step);
+				$('#step_item_2').show();
+				$('#step_item_3').show();
+				showTooltip(3);
+				hideLoader();
+				setMenu(3);
+				showGraphs(3);
+				drawDrillDown(results.responseText);
+			}
+		});
+	}
+}
+
+function drawDrillDown(dataJSON){
+	//COMPLICATION CHART
+
+	var drill_down_comorb_data = new google.visualization.DataTable(dataJSON);
+
+	var drill_down_comorb_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			legend: {position: 'right', alignment: 'center'},
+			pieSliceText: 'value'
+	};
+
+	var drill_down_comorb_chart = new google.visualization.PieChart(document.getElementById('drill_down_comorb_chart'));
+	drill_down_comorb_chart.draw(drill_down_comorb_data, drill_down_comorb_options);
+	//setting the process source of the drill down chart
+	//$('#drill_down_comorb_chart').siblings('.chart_subtitle').text(processSource);
+
+	//TIMETOCOMPLICATION
+
+	var ttc_data = google.visualization.arrayToDataTable([
+	                                                      ['Complication', '0-6', '6-12', '12-18','18-24','24-30','30-36'],
+	                                                      ['Hypertension',  7, 8,9,10,4,2],
+	                                                      ['Nephropathy',  5,9,2,4,7,11],
+	                                                      ['Neuropathy',  2,7,1,0,8,19],
+	                                                      ['Retinopathy',  4,12,9,7,4,1]
+	                                                      ]);
+
+	var options = {
+			isStacked: true,
+			hAxis: {title: 'Complications', titleTextStyle: {color: 'red'}},
+			vAxis: {title: 'Time in Months', titleTextStyle: {color: 'red'}},
+			legend: { position: 'top', maxLines: 3 },
+			bar: { groupWidth: '75%' },
+			series: {0:{color: '#F0F2B8'},
+				1:{color: '#D1E49F'},
+				2:{color: '#9BD087'},
+				3:{color: '#4CB972'},
+				4:{color: '#00A957'},
+				5:{color: '#008646'}
+			}
+	};
+
+	var drill_down_timetocomp_chart = new google.visualization.ColumnChart(document.getElementById('drill_down_timetocomp_chart'));
+	drill_down_timetocomp_chart.draw(ttc_data, options);
+
+
+}
+
+function backToProcess(){
+	hideFilters(2);
+	hideFilters(3);
+	showTooltip(2);
+	setMenu(2);
+	hideGraphs(3);
+	showGraphs(2);
+}
+
+function bindSearchPatient(){
+	$('#searchPatientBtn').click(function(){
+		var patient = $("#patientTxt").val();
+
+		if(patient==null || patient==""){
+			alert("Please inserta patient name");
+		}
+		else{
+			hideFilters();
+			hideLoader();
+			hideGraphs(1);
+			hideGraphs(2);
+			hideGraphs(3);
+
+			showSinglePatientData();
+		}
+	});
+}
+
+function showSinglePatientData(){
+	
+	//single patient page menu settings
+	$("div", $("#singlePatientMenu")).each(function(){
+		$(this).width($("#menu_return").width());
+		$(this).height($("#menu_return").height());
+	});
+	
+	//$("#patientDetailsIntro").html("<b>Charts for Patient " + $("#patientTxt").val().toUpperCase() +"</b>");
+
+	//show status timeline
+	$("#singlePatientDataContainer").show();
+
+	selectPatientDataView($("#patientmenu1"));
+	
+//	//Diet Adherence
+//	$.ajax({
+//		url: "./i2b2Servlet/",
+//		dataType:"json",
+//		async: true,
+//		data: { step: "0",
+//			chart_type: "diet",
+//			patient_id: $("#patientTxt").val()
+//		},
+//		complete: function(results){
+//			var obj = $.parseJSON(results.responseText);
+//			var timelineData = new google.visualization.DataTable(obj.dietData);
+//
+//			var colorsArray = [];
+//			var colorMap = {
+//					// should contain a map of category -> color for every category
+//					'Bad'	: '#89B766',
+//					'Good'	: '#CECE73'
+//			}
+//			for (var i = 0; i < timelineData.getNumberOfRows(); i++) {
+//				colorsArray.push(colorMap[timelineData.getValue(i, 1)]);
+//			}
+//
+//			var timeLineChart_options = {
+//					timeline: { 
+//						groupByRowLabel: true
+//					},                          
+//					avoidOverlappingGridLines: true,
+//					height: 1600,
+//					width: 1600,
+//					colors: colorsArray
+//			};
+//
+//			var view = new google.visualization.DataView(timelineData);
+//			view.setColumns([0, 1, 2, 3]);
+//			var timeline_chart = new  google.visualization.Timeline(document.getElementById('dietDiv'));
+//			timeline_chart.draw(view, timeLineChart_options);
+//			//timeline_chart.draw(timelineData, timeLineChart_options);
+//		}
+//	});
+}
+
+function selectPatientDataView(caller){
+	var selected = $(".singlePatientMenuItemSelected"); 
+	
+	if(selected.attr("id")!=caller.attr("id")){
+		selected.removeClass("singlePatientMenuItemSelected").addClass("singlePatientMenuItem");
+		$("span",selected).removeClass("singlePatientMenuItemLabelSelected").addClass("singlePatientMenuItemLabel");
+		caller.removeClass("singlePatientMenuItem").addClass("singlePatientMenuItemSelected");
+		$("span",caller).removeClass("singlePatientMenuItemLabel").addClass("singlePatientMenuItemLabelSelected");
+	}
+	
+	if(caller.attr("id").contains("1")){
+		createHba1cChart();
+		$("#clinicalDataChartContainer").show();
+		$("#clinicalDataChartContainer").siblings().hide();
+	}
+	else if(caller.attr("id").contains("2")){
+		createTherapiesChart();
+		createTherapiesAdherenceChart();
+		$("#DrugChartContainer").show();
+		$("#DrugChartContainer").siblings().hide();
+	}
+		
+}
+
+function createTherapiesAdherenceChart(){
+	//Therapies Adherence
+	$.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: true,
+		data: { step: "0",
+			chart_type: "adherence2",
+			patient_id: $("#patientTxt").val()
+		},
+		complete: function(results){
+			var obj = $.parseJSON(results.responseText);
+			var timelineData = new google.visualization.DataTable(obj.therapyData);
+			var labelArray = obj.labelsArray;
+			var colorsArray = [];
+			var colorMap = {
+					// should contain a map of category -> color for every category
+					'YES'	: '#90cad2',
+					'NO'	: '#9a1c1f',
+					'OVER'	: '#125e84',
+					'INTERRUPTION'	: '#d3d3d2',
+			};
+			for (var i = 0; i < labelArray.length; i++) {
+//				var colorAdded = colorMap[timelineData.getValue(i, 1)];
+//				var index = $.inArray(colorAdded, colorsArray);
+//				if(index < 0){
+//					colorsArray.push(colorAdded);
+//				}
+				colorsArray.push(colorMap[labelArray[i]]);
+			}
+
+			var timeLineChart_options = {
+					timeline: { 
+						groupByRowLabel: true
+					},                          
+					avoidOverlappingGridLines: true,
+					height: 1600,
+					width: 1600,
+					colors: colorsArray,
+					backgroundColor: '#ffd'
+			};
+
+			var view = new google.visualization.DataView(timelineData);
+			view.setColumns([0, 1, 2, 3]);
+			var timeline_chart = new  google.visualization.Timeline(document.getElementById('therapyAdherenceDiv2'));
+			timeline_chart.draw(view, timeLineChart_options);
+			//timeline_chart.draw(timelineData, timeLineChart_options);
+		}
+	});
+	
+}
+
+function createTherapiesChart(){
+	//Therapies
+	$.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: true,
+		data: { step: "0",
+			chart_type: "therapy",
+			patient_id: $("#patientTxt").val()
+		},
+		complete: function(results){
+			//	alert(results.responseText)
+			$('.dynamicTherapyDiv').remove();
+			var obj = $.parseJSON(results.responseText);
+			var results = obj.results;
+			var startYear = obj.startYear;
+			var endYear = obj.endYear;
+			var index;
+			var myData;
+			var atcClass;
+			var chartData;
+			var maxRoundedValue;
+			for (index = 0; index < results.length; ++index) {
+				myData = results[index];
+				atcClass = myData.atc_class;
+				var myDivName = "thDiv_"+index;
+				$('#therapyDiv').append('<div class="dynamicTherapyDiv" style="height: 200" id='+myDivName+'>'+atcClass+'</div>');
+			}
+			for (index = 0; index < results.length; ++index) {
+				myData = results[index];
+				atcClass = myData.atc_class;
+				maxRoundedValue = myData.max_value;
+				chartData = myData.data;
+
+				var scatterChartData = new google.visualization.DataTable(chartData);
+				var scatterChartOptions = {
+						title: atcClass,
+						vAxis: {title: "DDD", minValue: 0, maxValue: maxRoundedValue },
+						hAxis: {viewWindow: {  min: new Date(startYear,1,1),  max: new Date(endYear,12,31)},
+							viewWindowMode: 'explicit'},
+							explorer: { actions: ['dragToZoom', 'rightClickToReset'],  maxZoomIn: .01 }
+//							,
+//							series: [{color: 'black', visibleInLegend: true}, 
+//							{color: 'red', visibleInLegend: true}]
+				};
+				var myDivName = "thDiv_"+index;
+				var scatter_chart = new google.visualization.ScatterChart(document.getElementById(myDivName));
+				scatter_chart.draw(scatterChartData, scatterChartOptions);
+
+
+			}
+
+		}
+	});
+}
+
+function createHba1cChart(){
+	//Hba1c
+	$.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: true,
+		data: { step: "0",
+			chart_type: "hba1c",
+			patient_id: $("#patientTxt").val()
+		},
+		complete: function(results){
+			var scatterChartData = new google.visualization.DataTable(results.responseText);
+			var scatterChartOptions = {
+					title: 'Hba1c' ,
+					vAxis: { title: "Percentage", minValue: 0},
+					lineDashStyle: [2, 2],
+					colors: ['#4a9ecf'],
+					pointSize: 5,
+					pointShape: 'circle',
+					explorer: { actions: ['dragToZoom', 'rightClickToReset'],  maxZoomIn: .01 },
+			};
+			var scatter_chart = new google.visualization.LineChart(document.getElementById('hba1c_chart'));
+			scatter_chart.draw(scatterChartData, scatterChartOptions);
+		}
+	});
+}

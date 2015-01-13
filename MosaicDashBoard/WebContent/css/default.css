@@ -1,0 +1,485 @@
+@font-face {
+font-family: ChaparraPro;
+src: url("../font/ChaparralPro-Regular.otf") format("opentype");
+}
+
+@font-face {
+font-family: MyriadPro;
+src: url("../font/MyriadPro-Regular.otf") format("opentype");
+}
+
+#dashboard_container {
+	width: 98%;
+	height: 98%;
+}
+
+#menu_container {
+	/*	border: solid 1px red; */
+	float: left;
+	width: 180px;
+	background-color: #f7f8f7;
+	margin-top: 10px;
+	margin-right: 5px;
+	border: 1px #bbbbbb solid;
+}
+
+#chart_container {
+	/*	border: solid 1px blue; */
+	float: left;
+}
+
+span.menu_item_label {
+	/*font-family: verdana;
+	font-weight: bold;*/
+	font-size: 14px;
+	padding-left: 10px;
+	font-family: MyriadPro;
+}
+
+div.menu_item {
+	background-color: #f0f1f0;
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px #bbbbbb solid;
+	color: #535b5b;
+	padding-top: 5px;
+}
+
+div.menu_item_selected {
+	background-color: #ffffff;
+	border-right: 1px #ffffff solid;
+	color: #000000;
+}
+
+div.menu_return {
+	/*background-color: #f9bd16;
+	color: #125e84;*/
+	background-color: #6AB7BF;
+	color: #FFFFFF;
+	font-family: MyriadPro;
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px #bbbbbb solid;
+	padding-top: 5px;
+	cursor: pointer;
+}
+
+.menu_section_item {
+	/*background-color: #f9bd16;;;
+	color: #125e84;*/
+	background-color: #6AB7BF;
+	color: #FFFFFF;
+	font-family: MyriadPro;
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px #bbbbbb solid;
+	padding-top: 5px;
+	margin-top: 50px;
+	border-top: 1px #bbbbbb solid;
+}
+
+#step_item_1 {
+	background-color: #AECBE8;
+}
+
+#step_item_2 {
+	background-color: #7CA9D6;
+}
+
+#step_item_3 {
+	background-color: #6792BC;
+}
+
+div.step_item {
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px #bbbbbb solid;
+	color: #ffffff;
+	padding-top: 5px;
+}
+
+div.chart_item {
+	float: left;
+	background-color: #ffffff;
+	border: solid 1px #bbbbbb;
+	margin-left: 10px;
+	margin-top: 10px;
+	/*	width: 600px; */
+	width: 32%;
+}
+
+div.chart_title {
+	background-color: #BABABA;
+	font-family: ChaparraPro;
+	/*font-weight: bold;*/
+	color: #ffffff;
+	padding: 3px;
+}
+
+div.chart_subtitle {
+	background-color: #e2e3e2;
+	font-family: verdana;
+	font-weight: bold;
+	color: #000000;
+	padding: 3px;
+}
+
+div.chart {
+	width: 100%;
+	height: 40%;
+}
+
+div.chart_all_ptns_btn {
+	float: right;
+	background-color: lime;
+}
+
+div.step_two {
+	width: 100%;
+}
+
+div.step_three {
+	
+}
+
+div.chart_inner_btn {
+	/*	background-color: #F7C42A;
+    border-top: 1px solid #BBBBBB; 
+	color: #003265;
+	font-family: verdana;
+	font-weight: bold;*/
+	cursor: pointer;
+	padding: 3px;
+	color: #015E84;
+	font-family: MyriadPro;
+}
+
+div.chart_step_two {
+	height: 90%;
+}
+
+.loader {
+	position: absolute;
+	z-index: 1000;
+	top: 50px;
+}
+
+#menu_tooltip {
+	/*background-color: #AECBE8;
+	font-family: verdana;
+	border-top: black;
+	border-bottom: black;*/
+	padding: 10px;
+	margin-top: 0px;
+	font-family: MyriadPro;
+	background-color: #E6E6E8;
+	border: none;
+}
+
+#searchPatientBtn {
+	/*background-color: #3787B2;
+	color: #ffffff;
+	font-family: verdana;
+	font-weight: bold;*/
+	width: 90%;
+	margin-top: 5px;	
+	cursor: pointer;
+	height: 25px;
+	font-size: 14px;
+	font-family: MyriadPro;
+	background-color: #6BB7BF;
+	color: #ffffff;
+	padding-top:5px;
+}
+
+#singlePatientDataContainer {
+	margin-top: 10px;
+	margin-left: 10px;
+}
+
+#statusChartTitle {
+	margin-left: 150px;
+	margin-bottom: 20px;
+	margin-top: 10px;
+}
+
+#scheduleTable {
+	margin-left: 75px;
+}
+
+#statusChart {
+	margin-left: 75px;
+	margin-right: 140px;
+}
+
+.singlePatientMenuItemSelected {
+	/*border: solid 1px #26b6ad;
+	background-color: #bae2e0;*/
+	float: left;
+	cursor: pointer;
+	background-color: #4D9599;
+	margin-right: 1px;
+	padding-top: 5px;
+	color: #FFFFFF;
+	font-family: MyriadPro;
+}
+
+.singlePatientMenuItemLabelSelected {
+	font-size: 16px;
+	padding-left: 10px;
+	color: #FFFFFF;
+	font-family: MyriadPro;
+}
+
+.singlePatientMenuItem {
+	/*border: solid 1px #125e84;
+	background-color: #2a919c;*/
+	float: left;
+	cursor: pointer;
+	background-color: #6BB7BF;
+	margin-right: 1px;
+	padding-top: 5px;
+	color: #FFFFFF;
+	font-family: MyriadPro;
+}
+
+.singlePatientMenuItemLabel {
+	font-family: verdana;
+	font-size: 16px;
+	padding-left: 10px;
+	color: white;
+	font-family: MyriadPro;
+}
+
+#singlePatientMenu{
+	height: 35px;
+}
+.example-table {
+	font-family: sans-serif;
+	-webkit-font-smoothing: antialiased;
+	font-size: 115%;
+	width: auto;
+	overflow: auto;
+	border: none;
+}
+
+.example-table th {
+	background-color: rgb(112, 196, 105);
+	font-weight: normal;
+	color: white;
+	/*padding: 20px 30px;*/
+	text-align: center;
+}
+
+.example-table td {
+	/*background-color: rgb(238, 238, 238);
+	padding: 20px 30px;
+	color: rgb(111, 111, 111);*/
+	border: none;
+}
+
+.atcItemSelected {
+	/*border: solid 1px #2a919c;
+	float: left;
+	margin-right: 1px;
+	padding-top: 5px;
+	cursor: pointer;
+	background-color: #bae2e0;*/
+	padding: 10px;
+	width: auto;
+	height: auto;
+	font-family: MyriadPro;
+	color: black;
+}
+
+.atcItem {
+	/*border: solid 1px #125e84;
+	float: left;	
+	margin-right: 1px;
+	padding-top: 5px;
+	cursor: pointer;
+	background-color: #26b6ad;*/
+	padding: 10px;
+	width: auto;
+	height: auto;
+	font-family: MyriadPro;
+	color: gray;
+}
+
+.atcSelected {
+	/*border: solid 1px #2a919c;
+	float: left;
+	margin-right: 1px;
+	padding-top: 5px;
+	background-color: #ec8168;*/
+	cursor: pointer;
+	width: auto;
+	height: auto;
+	padding: 10px;
+	font-family: MyriadPro;
+	color: black;
+}
+
+.atcUNSelected {
+	/*border: solid 1px #125e84;
+	float: left;
+	margin-right: 1px;
+	padding-top: 5px;
+	background-color: #f2a697;*/
+	cursor: pointer;
+	padding: 10px;
+	width: auto;
+	height: auto;
+	font-family: MyriadPro;
+	color: gray;
+}
+
+/* #Green Sea Flat Button
+==================================================*/
+.green-sea-flat-button {
+	position: relative;
+	vertical-align: top;
+	width: 200px;
+	height: 50px;
+	padding: 0;
+	font-size: 18px;
+	color: white;
+	text-align: center;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	background: #16a085;
+	border: 0;
+	border-bottom: 2px solid #14947b;
+	cursor: pointer;
+	-webkit-box-shadow: inset 0 -2px #14947b;
+	box-shadow: inset 0 -2px #14947b;
+}
+
+.green-sea-flat-button:active {
+	top: 1px;
+	outline: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.buttonTherapyDivClass {
+	/*border: solid 1px #125e84;*/
+	padding: 15px;
+}
+/* basic positioning 
+.legend li { float: left; margin-right: 10px; }*/
+.legend {
+	list-style: none;
+	margin-top: 55px;
+	font-family: MyriadPro;
+}
+
+.legend span {
+	/*border: 1px solid #ccc;*/
+	float: left;
+	width: 12px;
+	height: 12px;
+	margin: 2px;
+}
+/* your colors */
+.legend .Irisk {
+	background-color: #84d1ad;
+}
+
+.legend .IIrisk {
+	background-color: #01ae76;
+}
+
+.legend .IIIrisk {
+	background-color: #fdd687;
+}
+
+.legend .IVrisk {
+	background-color: #ff944c;
+}
+
+.legend .Vrisk {
+	background-color: #f34930;
+}
+
+.legend .VIrisk {
+	background-color: #c479b1;
+}
+.magicSquareItem{
+	float: left;
+	background-color: #BABABA;
+    height: 60px;
+    padding: 10px;
+    width: 60px;
+    border: 1px solid white;
+    font-size: 14px;
+    font-family: ChaparraPro;
+    color: #FFFFFF;
+}
+
+.dynamicTherapyDiv{
+	float: left;
+	width:85%;
+	height: 200px;
+}
+.magicSquareDivClass{
+	float: left;
+	width:15%;
+	height: 200px;
+	
+}
+.magicSquareFirstRow{
+	margin-top: 10px;
+}
+.atcTitleClass{
+	width:100%;
+	height: 20px;
+	background-color: #BABABA;
+	padding: 2px 0 2px 10px;
+	font-family: ChaparraPro;
+	color: #FFFFFF;
+}
+.therapiesSubMenu{
+	float: left;
+	height: 25px;
+    width: 170px;
+   /* border: 1px solid #26B6AD;
+    color: #414141;
+    font-family: ChaparraPro;
+    background-color: #BAE2E0;*/
+    background-color: #6BB7BF;
+    padding-top: 5px;
+    margin-right: 1px;
+    padding-left: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;  
+    color: #FFFFFF;
+    font-family: MyriadPro;
+}
+.therapiesSubMenuNotSelected{
+	/* background-color: #2a919c;
+   border: 1px solid #125e84;*/
+   background-color: #4D9599;
+	color: #FFFFFF;
+	font-family: MyriadPro;
+}
+
+.clinicalDatacTitleClass{
+	width:100%;
+	height: 20px;
+	background-color: #BABABA;
+	padding: 2px 0 2px 10px;
+	font-family: ChaparraPro;
+	color: #FFFFFF;
+}
+
+.clinicalDataTimeLine{
+	padding-top: 10px;
+}
+
+.filterBtn{
+	align: right;
+	cursor: pointer;  
+    color: #FFFFFF;
+    font-family: MyriadPro;
+    color: #015E84;
+}

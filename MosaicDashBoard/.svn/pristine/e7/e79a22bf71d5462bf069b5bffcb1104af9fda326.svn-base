@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+  <Resource name="jdbc/mosaici2b2" 
+            global="jdbc/mosaici2b2"
+            auth="Container"
+            type="javax.sql.DataSource" 
+            username="i2b2demodata"
+            password="demouser"
+            driverClassName="oracle.jdbc.driver.OracleDriver"
+			url="jdbc:oracle:thin:@10.7.59.126:1521:xe"
+            maxActive="8" 
+            maxIdle="4"/>             
+</Context>
+

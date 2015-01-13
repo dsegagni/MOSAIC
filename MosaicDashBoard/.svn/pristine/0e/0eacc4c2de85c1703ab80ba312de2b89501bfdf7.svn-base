@@ -1,0 +1,113 @@
+<html>
+  <head>
+  	<link href="css/default.css" rel="stylesheet" type="text/css">
+  	
+  	<script src="js/jquery-1.9.1.js"></script>
+  	<script src="js/jquery-ui-1.10.3.custom.js"></script>
+  	
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="js/dashboard_controller.js" ></script>
+    
+  </head>
+  <body>
+
+  <div id="dashboard_container">
+  	<div id="menu_container">
+  		<div id="menu_return" class="menu_return" onclick="homeClick();" title="Return to Home">
+  			<span class="menu_item_label" >Home</span>
+  		</div>
+  		<div id="menu_item_1" class="menu_item menu_item_selected">
+  			<span class="menu_item_label">General Charts</span>
+  		</div>
+  		<div id="menu_item_2" class="menu_item">
+  			<span class="menu_item_label">Process Results</span>
+  		</div>
+  		<div id="menu_item_3" class="menu_item">
+  			<span class="menu_item_label">Drill Down Results</span>
+  		</div>
+  		
+  		<div id="menu_filter_item" class="menu_section_item"title="Selection Filters">
+  			<span class="menu_item_label" >Filters</span>
+  		</div>
+  		<div id="step_item_1" class="step_item">
+  			<span class="menu_item_label">Step 1</span>
+  		</div>
+  		<div id="step_item_2" class="step_item">
+  			<span class="menu_item_label">Step 2</span>
+  		</div>
+  		<div id="step_item_3" class="step_item">
+  			<span class="menu_item_label">Step 3</span>
+  		</div>
+  		
+  		 <div id="menu_filter_item" class="menu_section_item"title="Selection Filters">
+  			<span class="menu_item_label" >Help</span>
+  		</div>
+  		<div id="menu_tooltip">
+  			<div id="step_1_tooltip">Click on a pie chart section to view the associated process path</div>
+  			<div id="step_2_tooltip">Click on a section of the timeline chart to view the complications of patients belonging to the history</div>
+  			<div id="step_3_tooltip">Click on a Home section in the menu or Back to Process inside the chart boxes to go back</div>
+  		</div>
+  		
+  	</div>
+  	<div id="chart_container">
+  		 <div id="loader" class="loader">
+  			<img src="images/ajax-loader.gif" />
+  			<br>
+  			<div>Loading chart...</div>
+  		</div>
+  		<div class="chart_item step_one">
+  			<div class="chart_title">Age at Diagnosis</div>
+  			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+  			<div class="chart" id="agediagnosis_chart"></div>
+  			<div class="chart_inner_btn" onclick="alert('all patient selected');" align="right">Select all patients</div>
+  		</div>
+  		<div class="chart_item step_one" >
+  			<div class="chart_title">Gender</div>
+  			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+  			<div class="chart" id="gender_chart"></div>
+  			<div class="chart_inner_btn" onclick="alert('all patient selected');" align="right">Select all patients</div>
+  		</div>
+  		  		<div class="chart_item step_one" >
+  			<div class="chart_title">Cardio Vascular Risk (CVR)</div>
+  				<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+  			<div class="chart" id="cvr_chart"></div>
+  			<div class="chart_inner_btn" onclick="alert('all patient selected');" align="right">Select all patients</div>
+  		</div>  	
+  		<div class="chart_item step_one" >
+  			<div class="chart_title">BMI</div>
+  			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+  			<div class="chart" id="bmi_chart"></div>
+  		</div>	
+  		<div class="chart_item step_one" >
+  			<div class="chart_title">Complications</div>
+  			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+  			<div class="chart" id="comorb_chart"></div>
+  		</div>
+  		
+  		<div class="chart_item step_two" >
+  			<div class="chart_title">Clinical Path</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart chart_step_two" id="path_chart"></div>
+  			<div class="chart_inner_btn" onclick="homeClick();" align="right">Back to Home</div>
+  		</div>
+  		
+  		 <div class="chart_item step_three" >
+  			<div class="chart_title">Drill Down on Complications</div>
+  			<div class="chart_subtitle">Distribution of complications</div>
+  			<div class="chart" id="drill_down_comorb_chart"></div>
+  			<div class="chart_inner_btn" onclick="backToProcess();" align="right">Back to Process</div>
+  		</div>
+
+		<div class="chart_item step_three" >
+  			<div class="chart_title">Time from diagnosis to complication</div>
+  			<div class="chart_subtitle">Six months discretization distribution</div>
+  			<div class="chart" id="drill_down_timetocomp_chart"></div>
+  			<div class="chart_inner_btn" onclick="backToProcess();" align="right">Back to Process</div>
+  		</div>
+  		
+  		<div style="clear: both;"></div>
+  	</div>
+  	<div style="clear: both;"></div>
+  </div>
+  </body>
+</html>

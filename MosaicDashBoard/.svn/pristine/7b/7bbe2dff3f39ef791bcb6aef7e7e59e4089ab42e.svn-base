@@ -1,0 +1,77 @@
+<html>
+  <head>
+  	<link href="css/default.css" rel="stylesheet" type="text/css">
+  	
+  	<script src="js/jquery-1.9.1.js"></script>
+  	<script src="js/jquery-ui-1.10.3.custom.js"></script>
+  	
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="js/dashboard_controller.js" ></script>
+    
+  </head>
+  <body>
+
+  <div id="dashboard_container">
+  	<div id="menu_container">
+  		<div id="menu_return" class="menu_return" onclick="homeClick();" title="Return to Home">
+  			<span class="menu_item_label" >Home</span>
+  		</div>
+  		<div id="menu_item_1" class="menu_item menu_item_selected">
+  			<span class="menu_item_label">General Charts</span>
+  		</div>
+  		<div id="menu_item_2" class="menu_item">
+  			<span class="menu_item_label">Process Results</span>
+  		</div>
+  		<div id="menu_item_3" class="menu_item">
+  			<span class="menu_item_label">Drill Down Results</span>
+  		</div>
+  	</div>
+  	<div id="chart_container">
+  		 <div id="loader">
+  			<img src="images/ajax-loader.gif"/>
+  		</div>
+  		<div class="chart_item step_one">
+  			<div class="chart_title">Age at Diagnosis</div>
+  			<div class="chart_subtitle">lorem ipsum<div class="chart_all_ptns_btn">All Patient</div><div style="clear: both;"></div></div>
+  			<div class="chart" id="agediagnosis_chart"></div>
+  		</div>
+  		<div class="chart_item step_one" >
+  			<div class="chart_title">Gender</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart" id="gender_chart"></div>
+  		</div>
+  		  		<div class="chart_item step_one" >
+  			<div class="chart_title">Cardio Vascular Risk (CVR)</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart" id="cvr_chart"></div>
+  		</div>  	
+  		<div class="chart_item step_one" >
+  			<div class="chart_title">BMI</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart" id="bmi_chart"></div>
+  		</div>	
+  		<div class="chart_item step_one" >
+  			<div class="chart_title">Complications</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart" id="comorb_chart"></div>
+  		</div>
+  		
+  		<div class="chart_item step_two" >
+  			<div class="chart_title">Clinical Path</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart" id="path_chart"></div>
+  		</div>
+  		
+  		 <div class="chart_item step_three" >
+  			<div class="chart_title">Drill Down on Complications</div>
+  			<div class="chart_subtitle">lorem ipsum</div>
+  			<div class="chart" id="drill_down_comorb_chart"></div>
+  			<div class="back_to_process_btn" onclick="backToProcess();">Back to Process</div>
+  		</div>
+  		
+  		<div style="clear: both;"></div>
+  	</div>
+  	<div style="clear: both;"></div>
+  </div>
+  </body>
+</html>

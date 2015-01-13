@@ -1,0 +1,16 @@
+{
+ "1234567": [
+{"DATA1":"10/06/2015", "DATA2":"11/02/2011", "REGIME":"1", "REPARTO":"3", "REP_STR":"oncologia"}
+{"DATA1":"10/06/2015", "DATA2":"11/02/2011", "REGIME":"1", "REPARTO":"1", "REP_STR":"radiologia"}
+]
+}
+
+
+{
+ "3245": [
+{"DATA1":"10/06/2004", "DATA2":"11/02/2013", "REGIME":"1", "REPARTO":"3", "REP_STR":"oncologia" }
+{"DATA1":"10/06/2033", "DATA2":"11/02/2011", "REGIME":"2", "REPARTO":"1", "REP_STR":"radiologia"}
+{"DATA1":"10/06/2022", "DATA2":"11/02/2012", "REGIME":"1", "REPARTO":"3", "REP_STR":"oncologia" }
+{"DATA1":"10/06/2002", "DATA2":"11/02/2011", "REGIME":"2", "REPARTO":"4", "REP_STR":"generale"}
+]
+}

@@ -1,0 +1,51 @@
+
+<!-- SINGLE PATIENT DATA -->
+
+
+<div id="singlePatientMenu">
+	<div class="singlePatientMenuItemSelected" onclick="selectPatientDataView($(this));" id="patientmenu1">	
+		<span class="singlePatientMenuItemLabelSelected">Clinical data</span>
+	</div>
+	<div class="singlePatientMenuItem" onclick="selectPatientDataView($(this));" id=patientmenu2>
+		<span class="singlePatientMenuItemLabel">Therapies</span>
+	</div>
+	<div class="singlePatientMenuItem" onclick="selectPatientDataView($(this));" id="patientmenu3">
+		<span class="singlePatientMenuItemLabel">Chart cathegory 3</span>
+	</div>
+	<div class="singlePatientMenuItem" onclick="selectPatientDataView($(this));" id="patientmenu4">
+		<span class="singlePatientMenuItemLabel">Chart cathegory 4</span>
+	</div>
+	<div style="clear: both;"></div>
+</div>
+
+<!-- <div id="cvrChart"></div>
+  			<div id="drugsChart"></div>
+  			<div id="statusChartTitle"><b>Patient Status Evolution</b></div>
+  			<div id="statusChart"></div>
+  			<div id="scheduleTable">
+  				<div style="margin-bottom: 10px;"><b>Visit schedule and adherence indicator</b></div>
+  				<img alt="" src="images/schedule_patient.PNG" width="500">
+  			</div> -->
+<div id="singlePatientChartGrouper">
+	<div id="clinicalDataChartContainer">
+		<div id="hba1c_chart"></div>
+		<div id="diet_chart">DIET CHART</div>
+		<div id="weight_chart">WEIGHT CHART</div>
+		
+	</div>  			
+	<div id="DrugChartContainer">
+		<div id="therapyChartTab">
+			<div>Therapies</div>
+			<div>Therapies Adherence</div>
+			<div style="clear: both;"></div>
+		</div>
+		<div id="therapyDiv"></div>
+		<div id="therapyAdherenceDiv2"></div>
+		<div id="therapyAdherenceFilterDiv"></div>
+		<div id="therapyAdherenceDiv3"></div>
+		<div id="magicSquareDiv"></div>
+	</div>
+</div>
+
+
+

@@ -1,0 +1,100 @@
+#dashboard_container{
+	width: 98%;
+	height: 98%;
+}
+
+#menu_container{
+/*	border: solid 1px red; */
+	float: left;
+	width: 180px;
+	background-color: #f7f8f7;
+	margin-top: 10px;
+	margin-right: 5px;
+	border: 1px #bbbbbb solid;
+}
+
+#chart_container{
+/*	border: solid 1px blue; */
+	float: left;
+}
+
+span.menu_item_label{
+   	font-family: verdana;
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+div.menu_item{
+	background-color: #f0f1f0;
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px #bbbbbb solid;
+	color: #535b5b;
+	padding-top: 5px;
+}
+
+div.menu_item_selected{
+	background-color: #ffffff;
+	border-right: 1px #ffffff solid;
+	color: #000000;
+}
+
+div.menu_return{
+	background-color: #306499;
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px #bbbbbb solid;
+	color: #ffffff;
+	padding-top: 5px;
+	cursor: pointer;
+}
+
+div.chart_item{
+	float: left;
+	background-color: #ffffff;
+	border: solid 1px #bbbbbb;
+	margin-left: 10px;
+	margin-top: 10px;
+	width: 600px;
+}
+
+div.chart_title{
+	background-color: #003265;
+	font-family: sans-serif;
+	font-weight: bold;
+	color: #ffffff;
+	padding: 3px;	
+}
+
+div.chart_subtitle{
+	background-color: #e2e3e2;
+	font-family: sans-serif;
+	font-weight: bold;
+	color: #000000;
+	padding: 3px;
+}
+
+div.chart{
+	width: 100%;
+	height: 45%;
+}
+
+
+div.chart_all_ptns_btn{
+	float: right; 
+	background-color: lime;
+}
+
+div.step_two{
+	width: 100%;
+}
+
+div.step_three{
+	
+}
+div.back_to_process_btn{
+	border: solid 1px red;
+	padding: 3px;
+	cursor: pointer;
+}
